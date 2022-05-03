@@ -41,10 +41,10 @@ async function run() {
 
     }
     catch {
-        console.error();
+        console.error('connection interupted');
     }
     finally {
-        client.close();
+        // client.close();
         console.log({ connection: "closed" });
     }
 }
