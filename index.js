@@ -40,8 +40,11 @@ async function run() {
         });
 
     }
+    catch {
+        console.error();
+    }
     finally {
-
+        client.close();
         console.log({ connection: "closed" });
     }
 }
