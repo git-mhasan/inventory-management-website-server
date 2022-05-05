@@ -17,12 +17,31 @@ async function run() {
         await client.connect();
         const productCollection = client.db('greenTechDB').collection("products");
 
+        //Insert Product
         app.post('/product', async (req, res) => {
             const product = req.body;
             const result = await productCollection.insertOne(product);
             res.send(result);
         })
 
+        // Update a Product
+        app.put('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            const newProduct = req.body;
+            console.log(newProduct);
+            const filter = { _id: ObjectId(id) };
+            const option = { upsert: true }
+            const updatedProduct = {
+                $set: {
+                    quantity: newProduct.quantity,
+                    sold: newProduct.sold
+                }
+            };
+            const result = await productCollection.updateOne(filter, updatedProduct, option);
+            res.send(result);
+        });
+
+        // Get all products
         app.get('/product', async (req, res) => {
             const query = {};
             const cursor = productCollection.find(query);
@@ -30,6 +49,8 @@ async function run() {
             res.send(products);
             // console.log({ products });
         });
+
+        // Get product by ID
         app.get('/product/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
