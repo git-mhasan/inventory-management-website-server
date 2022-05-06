@@ -20,15 +20,23 @@ async function run() {
         //Insert Product
         app.post('/product', async (req, res) => {
             const product = req.body;
+            console.log(product);
             const result = await productCollection.insertOne(product);
             res.send(result);
         })
 
+        //Delete an item
+        app.delete("/product/:id", async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await productCollection.deleteOne(query);
+            res.send(result);
+        })
         // Update a Product
         app.put('/product/:id', async (req, res) => {
             const id = req.params.id;
             const newProduct = req.body;
-            console.log(newProduct);
+            // console.log(newProduct);
             const filter = { _id: ObjectId(id) };
             const option = { upsert: true }
             const updatedProduct = {
@@ -65,7 +73,7 @@ async function run() {
         console.error('connection interupted');
     }
     finally {
-        // client.close();
+        client.close();
         console.log({ connection: "closed" });
     }
 }
