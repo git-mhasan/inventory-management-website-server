@@ -73,7 +73,7 @@ async function run() {
         console.error('connection interupted');
     }
     finally {
-        client.close();
+        // client.close();
         console.log({ connection: "closed" });
     }
 }
