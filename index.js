@@ -18,9 +18,10 @@ function verifyJWT(req, res, next) {
     const token = authHeader.split(" ")[1];
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
         if (err) {
-            return res.status(403).send("Forbidden")
+            res.status(403).send("Forbidden")
         }
         req.decoded = decoded;
+        console.log(decoded);
         next();
     })
 }
@@ -67,7 +68,7 @@ async function run() {
 
         // Get all products
         app.get('/product', verifyJWT, async (req, res) => {
-            const decodedEmail = req.decoded.email;
+            const decodedEmail = req.decoded?.email;
             const email = req.query.email;
             let query = {};
             if (!!email === true && decodedEmail === email) {
