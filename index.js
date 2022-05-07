@@ -15,15 +15,19 @@ function verifyJWT(req, res, next) {
     if (!authHeader) {
         return res.status(401).send("unauthorized access!");
     }
-    const token = authHeader.split(" ")[1];
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-        if (err) {
-            return res.status(403).send("Forbidden")
-        }
-        req.decoded = decoded;
-        console.log(decoded);
-        next();
-    })
+    const token = authHeader?.split(" ")[1];
+    if (!!token) {
+        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+            if (err) {
+                res.status(403).send("Forbidden")
+            }
+            req.decoded = decoded;
+            console.log(decoded);
+            next();
+        })
+    }
+    next();
+
 }
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.1moqz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
