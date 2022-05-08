@@ -7,6 +7,7 @@ const port = process.env.PORT || 5000;
 
 const app = express();
 
+//midleware
 app.use(cors());
 app.use(express.json());
 
@@ -15,20 +16,20 @@ function verifyJWT(req, res, next) {
     if (!authHeader) {
         return res.status(401).send("unauthorized access!");
     }
-    const token = authHeader?.split(" ")[1];
-    if (!!token) {
-        jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-            if (err) {
-                res.status(403).send("Forbidden")
-            }
-            req.decoded = decoded;
-            console.log(decoded);
-            next();
-        })
-    }
-    next();
+    const token = authHeader.split(" ")[1];
+    console.log(token);
 
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+        if (err) {
+            res.status(403).send("Forbidden")
+        }
+        req.decoded = decoded;
+        console.log(decoded);
+        next();
+    })
 }
+
+//connecion string
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.1moqz.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
@@ -99,16 +100,9 @@ async function run() {
             res.send(product);
         });
 
-        // Auth Api
-        app.post("/login", async (req, res) => {
-            const email = req.body;
-            const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
-            res.send(accessToken);
-        })
-
     }
-    catch {
-        console.error('connection interupted');
+    catch (error) {
+        console.error(error);
     }
     finally {
         // client.close();
@@ -116,6 +110,13 @@ async function run() {
     }
 }
 run().catch(console.dir);
+
+// Auth Api
+app.post("/login", async (req, res) => {
+    const email = req.body;
+    const accessToken = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
+    res.send(accessToken);
+})
 
 app.get("/", (req, res) => {
     res.send('server is running.');
